@@ -1,0 +1,65 @@
+Hello guys welcome back to another THM Easy-Labs.
+Today I will be uncovering the step-by-step procedure I used to get the flag for this amazing lab known as CyberHeroes
+
+Step-by-Step Walkthrough
+
+Step 1: Initial Access
+Open your browser and navigate to the IP address of the deployed machine (e.g., http://10.10.51.141). You will be greeted by a stylized, superhero-themed landing page
+
+.
+
+Step 2: Navigate to the Login Page
+From the landing page, click on the "Login" button, usually located in the top navigation bar
+
+. This will take you to a page with a simple username and password form.
+
+Step 3: View the Page Source
+The login form might look normal, but it behaves suspiciously (e.g., checking credentials without a network request). This indicates client-side validation
+
+.
+
+    Right-click anywhere on the login page and select "View Page Source" (or press Ctrl+U on your keyboard)
+
+    .
+
+Step 4: Find the Hardcoded Credentials
+In the page source, look for a block of JavaScript code. You will find a conditional statement that looks like this:
+javascript
+
+if (a.value=="h3ck3rBoi" & b.value==RevereString("54321@terceSrepuS"))
+
+This reveals two crucial pieces of information:
+
+    The Username is h3ck3rBoi.
+
+    The Password is the reversed version of 54321@terceSrepuS.
+
+Step 5: Reverse the Password String
+The function RevereString (a typo, likely meant to be ReverseString) takes a string and reverses the order of its characters
+
+. To get the actual password, you need to reverse 54321@terceSrepuS.
+
+    You can do this easily in a Linux terminal using the rev command:
+    bash
+
+echo "54321@terceSrepuS" | rev
+
+The output will be the password: SuperSecret@12345
+
+    .
+
+Step 6: Log In and Capture the Flag
+Go back to the login page and enter the credentials you found:
+
+    Username: h3ck3rBoi
+
+    Password: SuperSecret@12345
+
+Press enter. Upon successful login, you will be redirected to a new page that displays the flag
+
+.
+
+Final Answer:
+text
+
+flag{edb0be532c540b1a150c3a7e85d2466e}

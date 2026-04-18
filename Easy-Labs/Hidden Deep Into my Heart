@@ -1,26 +1,24 @@
+***********************
 Phase 1: Reconnaissance
-
+***********************
 Start by navigating to the target machine's IP address on port 5000:
 http://MACHINE_IP:5000
 
-
-
+*********************************
 Phase 2: The robots.txt Discovery
-
+*********************************
 Check the robots.txt file:
 http://MACHINE_IP:5000/robots.txt
 
-
-
+***************************
 Phase 3: Entering the Vault
-
+***************************
 Navigate to the hidden directory:
 http://MACHINE_IP:5000/cupids_secret_vault/
 
-
-
+******************************
 Phase 4: Directory Enumeration
-
+******************************
 Since the page doesn't link to anything, use a tool like dirsearch or gobuster to fuzz for directories:
 bash
 
@@ -28,19 +26,17 @@ dirsearch -u http://MACHINE_IP:5000/cupids_secret_vault/
 
 Result: You will find a 200 status code for /administrator
 
-
-
+******************
 Phase 5: The Login
-
+******************
 You are presented with a login form for "Cupid's Vault".
 
     Username: admin (Standard default)
 
     Password: cupid_arrow_2026!!! (Found in robots.txt)
 
-
-
+*****************
 Phase 6: The Flag
-
+*****************
 Upon successful login, you will see the flag:
 THM{l0v3_is_in_th3_r0b0ts_txt}
